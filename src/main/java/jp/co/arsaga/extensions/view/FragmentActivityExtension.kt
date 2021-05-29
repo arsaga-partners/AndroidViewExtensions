@@ -33,11 +33,12 @@ fun FragmentActivity.safeShowDialogFragment(dialogFragment: DialogFragment) {
 }
 
 fun FragmentActivity.dismissAllDialogFragment() {
-    supportFragmentManager
-        .fragments
-        .filterIsInstance<DialogFragment>()
-        .forEach { it.dismissAllowingStateLoss() }
+    getAllDialogFragment().forEach { it.dismissAllowingStateLoss() }
 }
+
+fun FragmentActivity.getAllDialogFragment(): List<DialogFragment> = supportFragmentManager
+    .fragments
+    .filterIsInstance<DialogFragment>()
 
 fun FragmentActivity.setDestinationChangeListener(
     navHostFragmentId: Int,
