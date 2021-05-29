@@ -11,7 +11,10 @@ import androidx.navigation.ui.setupWithNavController
 
 
 fun FragmentActivity.setTitleNavHostFragment(navHostFragmentId: Int, toolbar: Toolbar) {
-    findNavControllerByNavHostFragmentId(supportFragmentManager, navHostFragmentId).let { navController ->
+    findNavControllerByNavHostFragmentId(
+        supportFragmentManager,
+        navHostFragmentId
+    ).let { navController ->
         toolbar.apply {
             setupWithNavController(navController)
             setNavigationOnClickListener {
@@ -67,4 +70,5 @@ private fun getCurrentDisplayFragment(
 fun findNavControllerByNavHostFragmentId(
     fragmentManager: FragmentManager,
     navHostFragmentId: Int
-): NavController = (fragmentManager.findFragmentById(navHostFragmentId) as NavHostFragment).navController
+): NavController = (fragmentManager.findFragmentById(navHostFragmentId) as NavHostFragment)
+    .navController
