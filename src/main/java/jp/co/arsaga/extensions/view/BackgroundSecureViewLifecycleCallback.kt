@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 
 
 /**
@@ -15,8 +17,6 @@ import android.view.View
  * ルートビューの透明度を変更して端末所有者以外に画面の内容を見られないようにするクラス。
  *
  * ApplicationのregisterLifecycleCallbacksでこのクラスを登録することで有効化される。
- *
- * DialogFragmentやAlertDialogは別途対応が必要になる。
  */
 
 class BackgroundSecureViewLifecycleCallback : Application.ActivityLifecycleCallbacks {
@@ -25,6 +25,8 @@ class BackgroundSecureViewLifecycleCallback : Application.ActivityLifecycleCallb
     override fun onActivityStopped(activity: Activity) {}
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
     override fun onActivityDestroyed(activity: Activity) {}
+    private fun getDialogRootView(dialogFragment: DialogFragment): View? = dialogFragment
+        .dialog?.window?.decorView?.rootView
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         SecureInvisibleEventReceiver(activity)
@@ -32,6 +34,8 @@ class BackgroundSecureViewLifecycleCallback : Application.ActivityLifecycleCallb
 
     override fun onActivityResumed(activity: Activity) {
         activity.getRootView().run(Companion::onRerunVisible)
+        if (activity is FragmentActivity) activity.getAllDialogFragment()
+            .forEach { getDialogRootView(it)?.run(BackgroundSecureViewLifecycleCallback::onRerunVisible) }
     }
 
     private inner class SecureInvisibleEventReceiver(val activity: Activity) : BroadcastReceiver() {
@@ -40,6 +44,8 @@ class BackgroundSecureViewLifecycleCallback : Application.ActivityLifecycleCallb
 
         override fun onReceive(arg0: Context?, arg1: Intent?) {
             activity.getRootView().run(Companion::onHomeInvisible)
+            if (activity is FragmentActivity) activity.getAllDialogFragment()
+                .forEach { getDialogRootView(it)?.run(BackgroundSecureViewLifecycleCallback::onHomeInvisible) }
         }
 
         init {
