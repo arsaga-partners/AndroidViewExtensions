@@ -12,13 +12,9 @@ interface HasProgressBarActivity {
 
     fun getProgressBar(): ProgressBar?
 
-    fun progressBarToggle(isVisible: Boolean?) {
-        getProgressBar()?.toggle(isVisible == true)
-    }
-
     abstract class LoadingHandler :  Application.ActivityLifecycleCallbacks {
 
-        protected abstract val apiConnectionCounter: LiveData<Int>
+        protected abstract val loadingStatus: LiveData<Boolean?>
 
         override fun onActivityStarted(activity: Activity) {}
         override fun onActivityResumed(activity: Activity) {}
@@ -30,9 +26,8 @@ interface HasProgressBarActivity {
             if (
                 activity is HasProgressBarActivity
                 && activity is FragmentActivity
-            ) apiConnectionCounter.observe(activity) {
-                it ?: return@observe
-                activity.getProgressBar()?.toggle(it != 0)
+            ) loadingStatus.observe(activity) {
+                activity.getProgressBar()?.toggle(it == true)
             }
         }
     }
